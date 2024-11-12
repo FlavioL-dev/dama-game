@@ -10,18 +10,9 @@ const areEqual = (prevProps: CellFCProps, nextProps: CellFCProps) => {
 
 interface CellFCProps {
   cell: CellProp;
-  onCellClick: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => void;
-  onCellHoverStart: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => void;
-  onCellHoverEnd: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => void;
+  onCellClick: (pos: Position) => void;
+  onCellHoverStart: (pos: Position) => void;
+  onCellHoverEnd: (pos: Position) => void;
 }
 
 const CellFC: React.FC<CellFCProps> = React.memo(
@@ -53,14 +44,14 @@ const CellFC: React.FC<CellFCProps> = React.memo(
     return (
       <div
         style={cellStyle}
-        onClick={(e) => {
-          onCellClick(e, cell.position);
+        onClick={() => {
+          onCellClick(cell.position);
         }}
-        onMouseEnter={(e) => {
-          onCellHoverStart(e, cell.position);
+        onMouseEnter={() => {
+          onCellHoverStart(cell.position);
         }}
-        onMouseLeave={(e) => {
-          onCellHoverEnd(e, cell.position);
+        onMouseLeave={() => {
+          onCellHoverEnd(cell.position);
         }}
       >
         {cell.piece !== PieceType.EMPTY && (

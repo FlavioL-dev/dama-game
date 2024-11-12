@@ -6,18 +6,9 @@ import Position, { getPosKeyFromPos } from "../models/Position";
 interface BoardFCProps {
   key: string;
   board: Board;
-  onCellClick: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => Position[];
-  onCellHoverStart: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => Position[];
-  onCellHoverEnd: (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    pos: Position
-  ) => Position[];
+  onCellClick: (pos: Position) => Position[];
+  onCellHoverStart: (pos: Position) => Position[];
+  onCellHoverEnd: (pos: Position) => Position[];
 }
 
 const BoardFC: React.FC<BoardFCProps> = ({
@@ -29,14 +20,10 @@ const BoardFC: React.FC<BoardFCProps> = ({
   const [counter, setCounter] = useState(0);
 
   const update = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pos: Position,
-    func: (
-      arg0: React.MouseEvent<HTMLDivElement, MouseEvent>,
-      arg1: Position
-    ) => Position[]
+    func: (arg1: Position) => Position[]
   ): Position[] => {
-    let res = func(e, pos);
+    let res = func(pos);
     if (res.length > 0) {
       setCounter(counter + 1);
     }
@@ -56,9 +43,9 @@ const BoardFC: React.FC<BoardFCProps> = ({
               <CellFC
                 key={cell.getKey()}
                 cell={cell.getProp()}
-                onCellClick={(e, pos) => update(e, pos, onCellClick)}
-                onCellHoverStart={(e, pos) => update(e, pos, onCellHoverStart)}
-                onCellHoverEnd={(e, pos) => update(e, pos, onCellHoverEnd)}
+                onCellClick={(pos) => update(pos, onCellClick)}
+                onCellHoverStart={(pos) => update(pos, onCellHoverStart)}
+                onCellHoverEnd={(pos) => update(pos, onCellHoverEnd)}
               />
             );
           })}

@@ -32,7 +32,6 @@ const GameFC: React.FC<GameFCProps> = ({ game }) => {
 
   // Handle cell click
   const handleCellClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pos: Position
   ): Position[] => {
     console.log(`CellFC onCellClick at position: ${pos.row}, ${pos.col}`);
@@ -48,7 +47,6 @@ const GameFC: React.FC<GameFCProps> = ({ game }) => {
 
   // Handle hover start event
   const handleCellHoverStart = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pos: Position
   ): Position[] => {
     console.log(`CellFC onHoverStart at position: ${pos.row}, ${pos.col}`);
@@ -57,7 +55,6 @@ const GameFC: React.FC<GameFCProps> = ({ game }) => {
 
   // Handle hover end event
   const handleCellHoverEnd = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
     pos: Position
   ): Position[] => {
     console.log(`CellFC onHoverEnd at position: ${pos.row}, ${pos.col}`);

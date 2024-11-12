@@ -148,20 +148,25 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
 
       setGame(new Game(toGame(gameData as GameJson), user.uid, onGameChange));
 
-      const unsubscribeGame = onSnapshot(
-        doc(firestore, "games", gameId),
-        (docSnapshot) => {
-          if (docSnapshot.exists()) {
-            setGame(
-              new Game(
-                toGame(docSnapshot.data() as GameJson),
-                user.uid,
-                onGameChange
-              )
-            );
+      const gameDocRef = doc(firestore, "games", gameId);
+
+      useEffect(() => {
+        const unsubscribeGame = onSnapshot(
+          gameDocRef,
+          (docSnapshot) => {
+            if (docSnapshot.exists()) {
+              setGame(
+                new Game(
+                  toGame(docSnapshot.data() as GameJson),
+                  user.uid,
+                  onGameChange
+                )
+              );
+            }
           }
-        }
-      );
+        );
+        return () => unsubscribeGame();
+      }, [gameDocRef]);
       return;
     }
     const newGame: Game = new Game(
@@ -193,17 +198,21 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
     });
 
     const gameDocRef = doc(firestore, "games", newGame.getProp().uuid);
-    const unsubscribeGame = onSnapshot(gameDocRef, (docSnapshot) => {
-      if (docSnapshot.exists()) {
-        setGame(
-          new Game(
-            toGame(docSnapshot.data() as GameJson),
-            user ? user.uid : "guest",
-            onGameChange
-          )
-        );
-      }
-    });
+
+    useEffect(() => {
+      const unsubscribeGame = onSnapshot(gameDocRef, (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          setGame(
+            new Game(
+              toGame(docSnapshot.data() as GameJson),
+              user ? user.uid : "guest",
+              onGameChange
+            )
+          );
+        }
+      });
+      return () => unsubscribeGame();
+    }, [gameDocRef]);
   };
 
   const handlePlayWithFriend = () => {
