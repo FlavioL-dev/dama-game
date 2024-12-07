@@ -1,0 +1,72 @@
+.user-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    max-width: 90%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .user-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .welcome-message {
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+  
+  .login-container p {
+    font-size: 1rem;
+  }
+  
+  @media (max-width: 768px) {
+
+    .user-container {
+        padding: 5px;
+      }
+
+    .user-avatar {
+      width: 90px;
+      height: 90px;
+    }
+  
+    .welcome-message {
+        font-size: calc(0.5vw + 8px);
+    }
+    .login-container {
+        font-size: calc(0.5vw + 8px);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .user-container {
+        padding: 2px;
+      }
+
+    .user-avatar {
+      width: 70px;
+      height: 70px;
+    }
+  }
+  

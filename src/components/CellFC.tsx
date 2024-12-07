@@ -1,12 +1,23 @@
-import React, { useEffect } from "react";
+import React from "react";
 import CellProp from "../models/CellProp";
 import PieceType, { getImgPath } from "../models/PieceType";
 import Position from "../models/Position";
 import ColorType from "../models/ColorType";
+import "../CellFC.css";
+
+const getCellClass = (cell: CellProp): string => {
+  if (cell.color === ColorType.HIGHLIGHT) return "cell-highlight";
+  if (cell.color === ColorType.SELECTED) return "cell-selected";
+  return (cell.position.row + cell.position.col) % 2 === 0
+    ? "cell-light"
+    : "cell-dark";
+};
 
 const areEqual = (prevProps: CellFCProps, nextProps: CellFCProps) => {
-  return prevProps.cell === nextProps.cell;
-};
+  return prevProps.cell.color === nextProps.cell.color 
+    && prevProps.cell.piece === nextProps.cell.piece
+    && prevProps.cell.position === nextProps.cell.position;
+}
 
 interface CellFCProps {
   cell: CellProp;
@@ -15,51 +26,21 @@ interface CellFCProps {
   onCellHoverEnd: (pos: Position) => void;
 }
 
+/**
+ * CellFC Component - Single board Cell
+ */
 const CellFC: React.FC<CellFCProps> = React.memo(
   ({ cell, onCellClick, onCellHoverStart, onCellHoverEnd }) => {
-    const getColor = (): string => {
-      return cell.color == ColorType.HIGHLIGHT
-        ? "#ffe81c"
-        : cell.color == ColorType.SELECTED
-        ? "#00ff00"
-        : (cell.position.row + cell.position.col) % 2 === 0
-        ? "#EEEED2"
-        : "#bf8040";
-    };
-
-    // Determina lo stile in base al colore della cella
-    const cellStyle = {
-      backgroundColor: getColor(),
-      width: "50px",
-      height: "50px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      cursor: "pointer",
-    };
-    useEffect(() => {
-      //console.log(`CellFC re-rendered for cell at position: ${cell.position.row}, ${cell.position.col}`);
-    }, [cell]);
 
     return (
       <div
-        style={cellStyle}
-        onClick={() => {
-          onCellClick(cell.position);
-        }}
-        onMouseEnter={() => {
-          onCellHoverStart(cell.position);
-        }}
-        onMouseLeave={() => {
-          onCellHoverEnd(cell.position);
-        }}
+        className={`cell ${getCellClass(cell)}`}
+        onClick={() => { onCellClick(cell.position); }}
+        onMouseEnter={() => { onCellHoverStart(cell.position); }}
+        onMouseLeave={() => { onCellHoverEnd(cell.position); }}
       >
         {cell.piece !== PieceType.EMPTY && (
-          <img
-            src={getImgPath(cell.piece)!}
-            alt={cell.piece}
-            style={{ width: "80%", height: "80%" }}
-          />
+          <img src={getImgPath(cell.piece)!} alt={cell.piece} />
         )}
       </div>
     );

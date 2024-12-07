@@ -9,7 +9,7 @@ export default interface GameJson {
   readonly uuid: string;
   readonly whitePlayerId: string; // UUID for the white player
   readonly blackPlayerId: string; // UUID for the black player
-  readonly winnerId: string | null; // UUID for the black player
+  readonly winnerId: string | null; // UUID of winner
   readonly currentTurn: "white" | "black";
   readonly forcedMoveCell: boolean | null; // Optional forced move
   readonly whiteMovesCount: number;

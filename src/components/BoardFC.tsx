@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Board from "../logic/Board";
 import CellFC from "./CellFC";
 import Position, { getPosKeyFromPos } from "../models/Position";
+import "../BoardFC.css";
 
 interface BoardFCProps {
   key: string;
@@ -11,13 +12,16 @@ interface BoardFCProps {
   onCellHoverEnd: (pos: Position) => Position[];
 }
 
+/**
+ * BoardFC Component - Contains the Cell grid
+ */
 const BoardFC: React.FC<BoardFCProps> = ({
   board,
   onCellClick,
   onCellHoverStart,
   onCellHoverEnd,
 }) => {
-  const [counter, setCounter] = useState(0);
+  const [_, setCounter] = useState(0);
 
   const update = (
     pos: Position,
@@ -25,18 +29,20 @@ const BoardFC: React.FC<BoardFCProps> = ({
   ): Position[] => {
     let res = func(pos);
     if (res.length > 0) {
-      setCounter(counter + 1);
+      setCounter((prevCounter)=>prevCounter + 1);
     }
-    for (let i = 0; i < res.length; i++)
-      console.log("changed " + getPosKeyFromPos(res[i]));
+    
+    //debug
+    res.forEach((position) => console.log("Updated cell " + getPosKeyFromPos(position)));
+
     return res;
   };
 
   return (
     <div className="board">
-      {[...Array(8)].map((_, row) => (
+      {Array.from({ length: 8 }).map((_, row) => (
         <div key={row} className="board-row">
-          {[...Array(8)].map((_, col) => {
+          {Array.from({ length: 8 }).map((_, col) => {
             const pos = { row, col };
             const cell = board.getCell(pos);
             return (

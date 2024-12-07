@@ -1,0 +1,29 @@
+.cell {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.cell-light {
+    background-color: #EEEED2;
+}
+
+.cell-dark {
+    background-color: #bf8040;
+}
+
+.cell-highlight {
+    background-color: #ffe81c;
+}
+
+.cell-selected {
+    background-color: #00ff00;
+}
+
+.cell img {
+    width: 80%;
+    height: 80%;
+}

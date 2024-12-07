@@ -6,6 +6,7 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ setUser }) => {
+
   const handleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);

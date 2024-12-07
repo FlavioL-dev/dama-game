@@ -3,7 +3,7 @@ import GameFC from "./GameFC";
 import Board from "../logic/Board";
 import Game from "../logic/Game";
 import GameMode from "../models/GameMode";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { auth, firestore } from "../logic/FirebaseConfig";
 import UserStatus from "./UserStatus";
 import { v4 as uuid } from "uuid";
@@ -20,17 +20,44 @@ import {
   where,
   getDocs,
   query,
+  DocumentReference,
 } from "firebase/firestore";
 import GameJson, { fromGame, toGame } from "../models/GameJson";
 import ShowStats from "./ShowStats";
+import "../HomeFC.css";
 
 interface HomeProps {}
 
+/**
+ * HomeFC Component - Main Menu for the Application.
+ */
 const HomeFC: React.FC<HomeProps> = ({}) => {
   const [user, setUser] = useState<User | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [showStats, setShowStats] = useState<boolean>(false);
+  const [gameDocRef, setGameDocRef] = useState<DocumentReference | null>(null);
+
+  useEffect(() => {
+    if (gameDocRef && user && user.uid !== "guest") {
+      const unsubscribeGame = onSnapshot(gameDocRef, (docSnapshot) => {
+        if (docSnapshot.exists()) {
+          setGame(
+            new Game(
+              toGame(docSnapshot.data() as GameJson),
+              user ? user.uid : "guest",
+              onGameChange
+            )
+          );
+        }
+      });
+      return () => unsubscribeGame();
+    }
+  }, [gameDocRef]);
+
+  const setLoginUser = useCallback((newUser: User | null) => {
+    setUser(newUser);
+  }, []);
 
   const onGameChange = async (gameProp: GameProp): Promise<void> => {
     if (gameProp.winnerId !== null) {
@@ -131,44 +158,31 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
       alert("Devi accedere per giocare online");
       return;
     }
+
     // (blackPlayerId = "none")
     const gamesRef = collection(firestore, "games");
     const q = query(gamesRef, where("blackPlayerId", "==", "none"));
     const querySnapshot = await getDocs(q);
 
+    // Check if there are available games
     if (!querySnapshot.empty) {
       const gameDoc = querySnapshot.docs[0];
       const gameData = gameDoc.data();
       const gameId = gameDoc.id;
 
+      // Set myself as the black player
       await setDoc(doc(firestore, "games", gameId), {
         ...gameData,
         blackPlayerId: user.uid,
       });
 
       setGame(new Game(toGame(gameData as GameJson), user.uid, onGameChange));
+      setGameDocRef(doc(firestore, "games", gameId)); // Set the gameDocRef
 
-      const gameDocRef = doc(firestore, "games", gameId);
-
-      useEffect(() => {
-        const unsubscribeGame = onSnapshot(
-          gameDocRef,
-          (docSnapshot) => {
-            if (docSnapshot.exists()) {
-              setGame(
-                new Game(
-                  toGame(docSnapshot.data() as GameJson),
-                  user.uid,
-                  onGameChange
-                )
-              );
-            }
-          }
-        );
-        return () => unsubscribeGame();
-      }, [gameDocRef]);
       return;
     }
+
+    // Create a new game if no available games
     const newGame: Game = new Game(
       {
         uuid: uuid(),
@@ -191,28 +205,13 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
       fromGame(newGame.getProp())
     );
 
-    // Aggiungi l'UUID della nuova partita nella lista delle partite in attesa
+    // Add the new game to the waitingGames collection
     await setDoc(doc(firestore, "waitingGames", newGame.getProp().uuid), {
       gameId: newGame.getProp().uuid,
       player: user.uid,
     });
 
-    const gameDocRef = doc(firestore, "games", newGame.getProp().uuid);
-
-    useEffect(() => {
-      const unsubscribeGame = onSnapshot(gameDocRef, (docSnapshot) => {
-        if (docSnapshot.exists()) {
-          setGame(
-            new Game(
-              toGame(docSnapshot.data() as GameJson),
-              user ? user.uid : "guest",
-              onGameChange
-            )
-          );
-        }
-      });
-      return () => unsubscribeGame();
-    }, [gameDocRef]);
+    setGameDocRef(doc(firestore, "games", newGame.getProp().uuid)); // Set the gameDocRef
   };
 
   const handlePlayWithFriend = () => {
@@ -237,28 +236,20 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
   };
 
   return (
-    <table>
+    <table className="table-container">
       <tbody>
         <tr>
-          <td width="20%" height={"25%"} className="left-bar">
-            <h1
-              onClick={() => {
-                setGame(null);
-                setShowStats(false);
-              }}
-            >
-              {" "}
-              Home{" "}
-            </h1>
+          <td height="75vh" className="left-bar">
+            <UserStatus setLoginUser={setLoginUser} />
           </td>
-          <td width={"80%"} rowSpan={2} height={"100%"}>
+          <td rowSpan={2}>
             {showStats ? (
               <>
-                <ShowStats user={user} userStats={userStats} />
+                <ShowStats key="user" user={user} userStats={userStats} />
               </>
             ) : game ? (
               <>
-                <GameFC game={game} key="game" />
+                <GameFC key="game" game={game} />
               </>
             ) : (
               <>
@@ -277,8 +268,19 @@ const HomeFC: React.FC<HomeProps> = ({}) => {
           </td>
         </tr>
         <tr>
-          <td height="75%" className="left-bar">
-            <UserStatus setLoginUser={setUser} />
+          <td height="25vh" className="left-bar">
+            {(game!==null || showStats) ? (
+              <button
+                onClick={() => {
+                  setGame(null);
+                  setShowStats(false);
+                }}
+              >
+                Home
+              </button>
+            ) : (
+              ""
+            )}
           </td>
         </tr>
       </tbody>

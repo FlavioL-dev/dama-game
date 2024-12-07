@@ -22,7 +22,6 @@ export default class SoundType {
   static GAME_END = new SoundType(GAME_END);
 
   play() {
-    console.log(this.filePath);
     const audio = new Audio(this.filePath);
     audio.play();
   }

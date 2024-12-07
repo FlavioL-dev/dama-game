@@ -10,6 +10,9 @@ interface ShowStatsProps {
   userStats: UserStats | null;
 }
 
+/**
+ * ShowStats Component - Show user stats
+ */
 const ShowStats: React.FC<ShowStatsProps> = ({ user, userStats }) => {
   const [userGames, setUserGames] = useState<GameJson[]>([]);
 
